@@ -17,7 +17,7 @@ trainingData = [
     [1, 1, 0]
 ]
 
-# treinando pra fica blindão
+# Training...
 for i in range(100000):
     q = random.randint(0, 3)
     brain.train([trainingData[q][0], trainingData[q][1]], [trainingData[q][2]])
