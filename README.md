@@ -60,4 +60,4 @@ print(output)
 
 * **Pedro Cleto** - *Library creator*
 
-Vários códigos que podem estar ai, que foram criados usando a minha biblioteca, não são meus.
+Vários códigos que podem estar ai, que foram criados usando a minha biblioteca, não necessariamente são meus.
