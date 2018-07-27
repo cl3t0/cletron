@@ -42,9 +42,7 @@ brain.generateRandBias()
 Gere ou crie seus dados de treinamento e treine sua rede:
 
 ```
-// Vamos treinar 10000 vezes
-for i in range(10000):
-  brain.train(input, output)
+brain.train(input, output)
 ```
 
 ### Teste
