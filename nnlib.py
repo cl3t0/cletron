@@ -178,7 +178,7 @@ class NeuralNetwork:
             # Calculating the error to every layer
 
             for a in range(self.numOfLayers-2, -1, -1):
-                for b in range(self.numOfNeurons[i]):
+                for b in range(self.numOfNeurons[a]):
                     newValue = 0
                     for i in range(self.numOfNeurons[a+1]):
                         denominator = 0
