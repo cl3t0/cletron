@@ -1,4 +1,4 @@
-# neuralnetworkslib (nnlib)
+# Neural Networks Library (nnlib)
 Uma biblioteca de redes neurais feita por mim em Python 3. É iniciante, mas é bem flexível.
 
 O uso dela está todo exemplificado no xor.py.
