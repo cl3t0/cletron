@@ -29,6 +29,13 @@ Agora é só configurar a quantidade de camadas e de neurônios em cada camada:
 brain.numOfLayers = 3
 brain.numOfNeurons = [2, 2, 1]
 ```
+
+Dar nome ao seu programa:
+
+```
+brain.programName = 'nomedomeuprograma'
+```
+
 Gerar todos os neurônios:
 
 ```
