@@ -29,17 +29,22 @@ Agora é só configurar a quantidade de camadas e de neurônios em cada camada:
 brain.numOfLayers = 3
 brain.numOfNeurons = [2, 2, 1]
 ```
-E gerar todos os neurônios, pesos e inclinações:
+Gerar todos os neurônios:
 
 ```
 brain.generateNeurons()
-brain.generateRandWeights()
-brain.generateRandBias()
+```
+
+E carregar todos os *weights* e os *bias* (relaxe, se não existir um arquivo para guardar os *weights* e os *bias*, ele irá criar para você :D):
+
+```
+brain.useStoredWeights()
+brain.useStoredBias()
 ```
 
 ### Treinamento
 
-Gere ou crie seus dados de treinamento e treine sua rede:
+Gere ou crie seus dados de treinamento e treine sua rede (Não se esqueça de treinar diversas vezes, para que o resultado se torne mais acurado):
 
 ```
 brain.train(input, output)
@@ -47,11 +52,20 @@ brain.train(input, output)
 
 ### Teste
 
-Depois disso você pode testar se a rede está boa:
+Depois disso você pode testar se a rede está com bons resultados:
 
 ```
 output = brain.guess(input)
 print(output)
+```
+
+### Armazenamento
+
+Não se esqueça de armazenar os *weights* e os *bias* ao final do código.
+
+```
+brain.storeWeights()
+brain.storeBias()
 ```
 
 ## Autor

@@ -5,10 +5,11 @@ brain = NeuralNetwork()
 
 brain.numOfLayers = 3
 brain.numOfNeurons = [2, 2, 1]
+brain.programName = 'xor'
 
 brain.generateNeurons()
-brain.generateRandWeights()
-brain.generateRandBias()
+brain.useStoredWeights()
+brain.useStoredBias()
 
 trainingData = [
     [0, 0, 0],
@@ -18,7 +19,7 @@ trainingData = [
 ]
 
 # Training...
-for i in range(100000):
+for i in range(1000):
     q = random.randint(0, 3)
     brain.train([trainingData[q][0], trainingData[q][1]], [trainingData[q][2]])
 
@@ -27,3 +28,6 @@ for i in trainingData:
     answer = i[2]
     print("Guess: " + str(guess[0]))
     print("Real Answer: " + str(answer))
+
+brain.storeWeights()
+brain.storeBias()

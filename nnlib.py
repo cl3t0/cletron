@@ -1,5 +1,26 @@
 import random
 import math
+import os
+import subprocess
+
+# Importing numpy
+
+try:
+
+    import numpy
+
+except ModuleNotFoundError:
+
+    try:
+
+        answer = subprocess.check_output('pip3 install numpy', shell=True).read()
+        
+    except subprocess.CalledProcessError:
+
+        os.system('sudo apt install python3-pip')
+        os.system('pip3 install numpy')
+
+    import numpy
 
 class NeuralNetwork:
 
@@ -13,6 +34,7 @@ class NeuralNetwork:
         self.learningRate = 1
         self.numOfLayers = 3
         self.numOfNeurons = [784, 16, 10]
+        self.programName = 'neuralnetwork'
 
     def generateNeurons(self):
 
@@ -37,6 +59,39 @@ class NeuralNetwork:
                     self.weights[i][j].append(random.random()*2-1) # Generates a value between -1 and 1.
     
     # Now we have to compute the initials bias.
+
+    def storeWeights(self):
+
+        numpyWeights = numpy.array(self.weights)
+        numpy.save(self.programName + '_weights', numpyWeights)
+
+
+    def useStoredWeights(self):
+
+        try:
+            self.weights = numpy.load(self.programName + '_weights.npy')
+
+        except FileNotFoundError:
+            
+            self.generateRandWeights()
+            self.storeWeights()
+
+
+    def storeBias(self):
+
+        numpyBias = numpy.array(self.bias)
+        numpy.save(self.programName + '_bias', numpyBias)
+
+
+    def useStoredBias(self):
+
+        try:
+            self.bias = numpy.load(self.programName + '_bias.npy')
+
+        except FileNotFoundError:
+            
+            self.generateRandBias()
+            self.storeBias()
 
     def generateRandBias(self):
 
