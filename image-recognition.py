@@ -3,8 +3,8 @@ from nnlib import NeuralNetwork
 
 brain = NeuralNetwork()
 
-brain.numOfLayers = 4
-brain.numOfNeurons = [784, 10, 10, 10]
+brain.numOfLayers = 3
+brain.numOfNeurons = [784, 16, 10]
 brain.programName = 'image-recognition'
 
 brain.generateNeurons()
@@ -26,16 +26,18 @@ quantidade = len(train_labels)
 for i in range(quantidade):
 	result = [0]*10
 	result[train_labels[i]] = 1
-	if i < 10:
-		print(result)
-	print('Treinando com a imagem {}/{}'.format(i, quantidade))
 	brain.train(train_images[i], result)
+	if i % 1000 == 0: print(round(100*i/quantidade, 1))
+
 
 test_images, test_labels = mndata.load_testing()
 
-for i in range(len(test_labels)):
-	brain.guess(test_images[i])
-	print()
+for i in range(1000):
+	guess = brain.guess(test_images[i])
+	print('------------')
+	print(guess)
+	print('guess: ' + str(guess.tolist().index(max(guess))))
+	print('real answer: ' + str(test_labels[i]))
 
 brain.storeWeights()
 brain.storeBias()
