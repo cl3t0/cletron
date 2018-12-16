@@ -24,13 +24,7 @@ except ModuleNotFoundError:
 
 def sigmoid(value):
 
-        try:
-
-            return 1/(1+math.exp(-value))
-
-        except OverflowError:
-
-            return 1/1+math.exp(709)
+    return 1/(1+math.exp(-value))
 
 def sigmoidDerivate(value):
 
@@ -51,7 +45,7 @@ def randommatrix2d(x, y):
 
             matrix[i].append(random.uniform(0,1))
 
-    return numpy.array(matrix, dtype=numpy.float64)
+    return numpy.array(matrix)
 
 def randommatrix1d(x):
 
@@ -61,7 +55,7 @@ def randommatrix1d(x):
 
         matrix.append(random.uniform(0,1))
 
-    return numpy.array(matrix, dtype=numpy.float64)
+    return numpy.array(matrix)
 
 class NeuralNetwork:
 
@@ -71,8 +65,6 @@ class NeuralNetwork:
         self.numOfLayers = 3
         self.numOfNeurons = [784, 16, 10]
         self.programName = 'neuralnetwork'
-        self.weights = []
-        self.bias = [0]
 
     def generateNeurons(self):
 
@@ -80,9 +72,11 @@ class NeuralNetwork:
 
         for i in range(self.numOfLayers):
 
-            self.neurons.append(numpy.array([0]*self.numOfNeurons[i], dtype=numpy.float64)[numpy.newaxis])
+            self.neurons.append(numpy.array([0]*self.numOfNeurons[i]))
 
     def generateRandWeights(self):
+
+        self.weights = []
 
         for i in range(self.numOfLayers-1):
             
@@ -105,11 +99,14 @@ class NeuralNetwork:
 
     def useStoredWeights(self):
 
+        self.weights = []
+
         try:
 
             for i in range(self.numOfLayers-1):
 
-                self.weights.append(numpy.load('{}/weight{}.npy'.format(self.programName, i)))
+                weight = numpy.load('{}/weight{}.npy'.format(self.programName, i))
+                self.weights.append(weight)
 
         except FileNotFoundError:
             
@@ -132,11 +129,14 @@ class NeuralNetwork:
 
     def useStoredBias(self):
 
+        self.bias = [0]
+
         try:
 
             for i in range(1, self.numOfLayers):
 
-                self.bias.append(numpy.load('{}/bias{}.npy'.format(self.programName, i)))
+                bias = numpy.load('{}/bias{}.npy'.format(self.programName, i))
+                self.bias.append(bias)
 
         except FileNotFoundError:
             
@@ -144,11 +144,13 @@ class NeuralNetwork:
             self.storeBias()
 
     def generateRandBias(self):
+
+        self.bias = [0]
         
         for i in range(1, self.numOfLayers):
 
-            matrix = randommatrix1d(self.numOfNeurons[i])
-            self.bias.append(matrix)
+            bias = randommatrix1d(self.numOfNeurons[i])
+            self.bias.append(bias)
 
     def propagate(self, layerToPropagate):
 
@@ -161,7 +163,7 @@ class NeuralNetwork:
 
         if len(inputData) == self.numOfNeurons[0]:
 
-            self.neurons[0] = numpy.array(inputData, dtype=numpy.float64)
+            self.neurons[0] = numpy.array(inputData)
 
             for i in range(1, self.numOfLayers):
 
@@ -179,13 +181,15 @@ class NeuralNetwork:
 
             guess = self.guess(inputData)
 
+            cost = numpy.sum(guess - numpy.array(expectedGuess))
+
             error = []
 
             for i in range(self.numOfLayers):
 
-                error.append(numpy.array([0]*self.numOfNeurons[i], dtype=numpy.float64))
+                error.append(numpy.array([0]*self.numOfNeurons[i]))
 
-            error[-1] = numpy.array(expectedGuess, dtype=numpy.float64) - guess
+            error[-1] = numpy.array(expectedGuess) - guess
 
             for i in range(self.numOfLayers-2, -1, -1):
 
