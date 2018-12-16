@@ -115,3 +115,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+
+
+# pre-trained weights and bias
+image-recognition/*
