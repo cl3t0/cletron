@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from mnist import MNIST
 from nnlib import NeuralNetwork
 
