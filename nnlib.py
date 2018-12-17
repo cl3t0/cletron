@@ -89,15 +89,6 @@ class NeuralNetwork:
         self.numOfNeurons = [784, 16, 10]
         self.programName = 'neuralnetwork'
 
-    def showArq(self):
-        print('--------------------------------------------------')
-        print('|  Layer 0  |       {}       |       {}       |'.format(round(self.neurons[0].item(0), 1), round(self.neurons[0].item(1), 1)))
-        print('| Weights 0 |0-{}-0|0-{}-1|0-{}-2|1-{}-0|1-{}-2|2-{}-2|'.format(round(self.weights[1].item((0, 0)), 1), round(self.weights[1].item((1, 0)), 1), round(self.weights[1].item((2, 0)), 1), round(self.weights[1].item((0, 1)), 1), round(self.weights[1].item((1, 1)), 1), round(self.weights[1].item((2, 1)), 1)))
-        print('|  Layer 1  |     {}     |     {}     |     {}     |'.format(round(self.neurons[1].item(0), 1), round(self.neurons[1].item(1), 1), round(self.neurons[1].item(2), 1)))
-        print('| Weights 0 | 0-{}-0 | 1-{}-0 | 2-{}-0 |'.format(round(self.weights[2].item((0, 0)), 1), round(self.weights[2].item((0, 1)), 1), round(self.weights[2].item((0, 2)), 1)))
-        print('|  Layer 2  |     {}     |'.format(round(self.neurons[2].item(0), 1)))
-        print('--------------------------------------------------')
-
     def generateNeurons(self):
 
         self.neurons = []
@@ -191,37 +182,21 @@ class NeuralNetwork:
 
     def propagate(self, layerToPropagate):
 
-        print('PROPAGANDO: {}->{}'.format(layerToPropagate-1, layerToPropagate))
-
         newmatrix = numpy.dot(self.weights[layerToPropagate], self.neurons[layerToPropagate-1])
         newmatrix += self.bias[layerToPropagate]
         self.weightedSum[layerToPropagate] = newmatrix
         newmatrix = sigmoid(newmatrix)
         self.neurons[layerToPropagate] = newmatrix
 
-        self.showArq()
-
     def guess(self, inputData):
 
         if len(inputData) == self.numOfNeurons[0]:
 
-            self.showArq()
-
-            print('INSERINDO O INPUT...')
-
             self.neurons[0] = numpy.array(inputData)
-
-            self.showArq()
-
-            print('INICIANDO PROPAGAÇÃO...')
 
             for i in range(1, self.numOfLayers):
 
                 self.propagate(i)
-
-            print('ENCERRANDO PROPAGAÇÃO...')
-
-            print('OUTPUT RETORNADO!')
 
             return self.neurons[-1]
         
