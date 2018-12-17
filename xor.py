@@ -4,9 +4,9 @@ import random
 brain = NeuralNetwork()
 
 brain.numOfLayers = 3
-brain.numOfNeurons = [2, 2, 1]
+brain.numOfNeurons = [2, 3, 1]
 brain.programName = 'xor'
-brain.verbose = False
+brain.learningRate = 0.1
 
 brain.generateNeurons()
 brain.useStoredWeights()
@@ -20,7 +20,7 @@ trainingData = [
 ]
 
 # Training...
-for i in range(100000):
+for i in range(10000):
     q = random.randint(0, 3)
     brain.train([trainingData[q][0], trainingData[q][1]], [trainingData[q][2]])
 

@@ -24,14 +24,37 @@ except ModuleNotFoundError:
 
 def sigmoid(value):
 
-    return 1/(1+math.exp(-value))
+    try:
+
+        return 1/(1+math.exp(-value))
+
+    except OverflowError:
+        
+        return 0
+    
 
 def sigmoidDerivate(value):
 
     return value * (1 - value)
 
+def squareit(value):
+
+    return value**2
+
+def rootit(value):
+
+    if value >= 0:
+
+        return math.sqrt(value)
+
+    else:
+
+        return -math.sqrt(abs(value))
+
 sigmoid = numpy.vectorize(sigmoid)
 sigmoidDerivate = numpy.vectorize(sigmoidDerivate)
+squareit = numpy.vectorize(squareit)
+rootit = numpy.vectorize(rootit)
 
 def randommatrix2d(x, y):
 
@@ -43,9 +66,9 @@ def randommatrix2d(x, y):
 
         for j in range(y):
 
-            matrix[i].append(random.uniform(0,1))
+            matrix[i].append(random.uniform(-1,1))
 
-    return numpy.array(matrix)
+    return numpy.array(matrix, dtype=numpy.float128)
 
 def randommatrix1d(x):
 
@@ -53,9 +76,9 @@ def randommatrix1d(x):
 
     for i in range(x):
 
-        matrix.append(random.uniform(0,1))
+        matrix.append(random.uniform(-1,1))
 
-    return numpy.array(matrix)
+    return numpy.array(matrix, dtype=numpy.float128)
 
 class NeuralNetwork:
 
@@ -66,21 +89,35 @@ class NeuralNetwork:
         self.numOfNeurons = [784, 16, 10]
         self.programName = 'neuralnetwork'
 
+    def showArq(self):
+        print('--------------------------------------------------')
+        print('|  Layer 0  |       {}       |       {}       |'.format(round(self.neurons[0].item(0), 1), round(self.neurons[0].item(1), 1)))
+        print('| Weights 0 |0-{}-0|0-{}-1|0-{}-2|1-{}-0|1-{}-2|2-{}-2|'.format(round(self.weights[1].item((0, 0)), 1), round(self.weights[1].item((1, 0)), 1), round(self.weights[1].item((2, 0)), 1), round(self.weights[1].item((0, 1)), 1), round(self.weights[1].item((1, 1)), 1), round(self.weights[1].item((2, 1)), 1)))
+        print('|  Layer 1  |     {}     |     {}     |     {}     |'.format(round(self.neurons[1].item(0), 1), round(self.neurons[1].item(1), 1), round(self.neurons[1].item(2), 1)))
+        print('| Weights 0 | 0-{}-0 | 1-{}-0 | 2-{}-0 |'.format(round(self.weights[2].item((0, 0)), 1), round(self.weights[2].item((0, 1)), 1), round(self.weights[2].item((0, 2)), 1)))
+        print('|  Layer 2  |     {}     |'.format(round(self.neurons[2].item(0), 1)))
+        print('--------------------------------------------------')
+
     def generateNeurons(self):
 
         self.neurons = []
+        self.weightedSum = [0]
 
         for i in range(self.numOfLayers):
 
-            self.neurons.append(numpy.array([0]*self.numOfNeurons[i]))
+            self.neurons.append(numpy.array([0]*self.numOfNeurons[i], dtype=numpy.float128))
+
+            if i > 0:
+
+                self.weightedSum.append(numpy.array([0]*self.numOfNeurons[i], dtype=numpy.float128))
 
     def generateRandWeights(self):
 
-        self.weights = []
+        self.weights = [0]
 
-        for i in range(self.numOfLayers-1):
+        for i in range(1, self.numOfLayers):
             
-            matrix = randommatrix2d(self.numOfNeurons[i+1], self.numOfNeurons[i])
+            matrix = randommatrix2d(self.numOfNeurons[i], self.numOfNeurons[i-1])
             self.weights.append(matrix)
 
     def storeWeights(self):
@@ -93,17 +130,17 @@ class NeuralNetwork:
 
             pass
 
-        for i in range(self.numOfLayers-1):
+        for i in range(1, self.numOfLayers):
 
             numpy.save('{}/weight{}.npy'.format(self.programName, i), self.weights[i])
 
     def useStoredWeights(self):
 
-        self.weights = []
+        self.weights = [0]
 
         try:
 
-            for i in range(self.numOfLayers-1):
+            for i in range(1, self.numOfLayers):
 
                 weight = numpy.load('{}/weight{}.npy'.format(self.programName, i))
                 self.weights.append(weight)
@@ -154,20 +191,37 @@ class NeuralNetwork:
 
     def propagate(self, layerToPropagate):
 
-        newmatrix = numpy.dot(self.weights[layerToPropagate-1], self.neurons[layerToPropagate-1])
+        print('PROPAGANDO: {}->{}'.format(layerToPropagate-1, layerToPropagate))
+
+        newmatrix = numpy.dot(self.weights[layerToPropagate], self.neurons[layerToPropagate-1])
         newmatrix += self.bias[layerToPropagate]
+        self.weightedSum[layerToPropagate] = newmatrix
         newmatrix = sigmoid(newmatrix)
         self.neurons[layerToPropagate] = newmatrix
+
+        self.showArq()
 
     def guess(self, inputData):
 
         if len(inputData) == self.numOfNeurons[0]:
 
+            self.showArq()
+
+            print('INSERINDO O INPUT...')
+
             self.neurons[0] = numpy.array(inputData)
+
+            self.showArq()
+
+            print('INICIANDO PROPAGAÇÃO...')
 
             for i in range(1, self.numOfLayers):
 
                 self.propagate(i)
+
+            print('ENCERRANDO PROPAGAÇÃO...')
+
+            print('OUTPUT RETORNADO!')
 
             return self.neurons[-1]
         
@@ -181,32 +235,31 @@ class NeuralNetwork:
 
             guess = self.guess(inputData)
 
-            cost = numpy.sum(guess - numpy.array(expectedGuess))
+            expectedGuess = numpy.array(expectedGuess)
 
-            error = []
+            cost = []
 
             for i in range(self.numOfLayers):
 
-                error.append(numpy.array([0]*self.numOfNeurons[i]))
+                cost.append(numpy.array([0]*self.numOfNeurons[i], dtype=numpy.float64))
 
-            error[-1] = numpy.array(expectedGuess) - guess
+            cost[-1] = squareit(guess - expectedGuess)
 
-            for i in range(self.numOfLayers-2, -1, -1):
+            for L in range(self.numOfLayers-1, 0, -1):
 
-                weightTranspose = self.weights[i].transpose()
-                matrix = numpy.dot(weightTranspose, error[i+1])
-                error[i] = matrix
+                weightTranspose = self.weights[L].T
+                matrix = numpy.dot(weightTranspose, cost[L])
+                cost[L-1] = matrix
 
-            for i in range(self.numOfLayers-1):
-                dlayer = sigmoidDerivate(self.neurons[i+1])
+                gradient = self.learningRate*numpy.multiply(cost[L], sigmoidDerivate(self.neurons[L]))
 
-                matrix1 = self.neurons[i][numpy.newaxis].T
-                matrix2 = self.learningRate * numpy.multiply(dlayer, error[i+1])[numpy.newaxis]
-                
-                newmatrix = numpy.dot(matrix1, matrix2).T
+                deltaWeight = numpy.dot(gradient, self.neurons[L][numpy.newaxis].T)
 
-                self.weights[i] += newmatrix
-                self.bias[i+1] += self.learningRate*numpy.multiply(error[i+1], self.neurons[i+1]*(-1)*(self.neurons[i+1]-1))
+                self.weights[L] += deltaWeight
+
+                deltaBias = gradient
+                self.bias[L] += deltaBias
+
 
             return guess
 
