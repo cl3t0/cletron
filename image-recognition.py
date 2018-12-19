@@ -26,6 +26,7 @@ print('--- tratando as imagens ---')
 for i in range(len(train_images)):
 	for j in range(len(train_images[i])):
 		train_images[i][j] = train_images[i][j]/255
+
 print('--- imagens tratadas ---')
 
 print('O treinamento iniciado!')
@@ -54,7 +55,7 @@ print('--- imagens tratadas ---')
 
 print('Teste iniciado!')
 
-for i in range(1000):
+for i in range(10):	#number of tests to display
 	guess = brain.guess(test_images[i])
 	print('------------')
 	print(guess)

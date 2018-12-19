@@ -2,6 +2,12 @@ import random
 import math
 import os
 import subprocess
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='[%(asctime)s] [%(levelname)-8s] - :%(message)s'
+)
 
 # Importing numpy
 
@@ -153,10 +159,12 @@ class NeuralNetwork:
             self.bias.append(bias)
 
     def propagate(self, layerToPropagate):
-
+        
         newmatrix = numpy.dot(self.weights[layerToPropagate-1], self.neurons[layerToPropagate-1])
         newmatrix += self.bias[layerToPropagate]
         newmatrix = sigmoid(newmatrix)
+        # esta correto mesmo mudar o valor dos neuronios?
+        # sera que essa 'newmatrix' nao deveria ser so o retorno dessa função?
         self.neurons[layerToPropagate] = newmatrix
 
     def guess(self, inputData):
@@ -168,7 +176,7 @@ class NeuralNetwork:
             for i in range(1, self.numOfLayers):
 
                 self.propagate(i)
-
+            # se for modificada msm a função 'propagate', possivelmente tem que mudar o retorno dessa aqui também
             return self.neurons[-1]
         
         else:
@@ -181,7 +189,9 @@ class NeuralNetwork:
 
             guess = self.guess(inputData)
 
+            # avaliar essa função custo. o normal é calcular a soma do erro ao quadrado, ou a soma do erro absoluto
             cost = numpy.sum(guess - numpy.array(expectedGuess))
+            logging.debug(f'Cost = {cost}')
 
             error = []
 
