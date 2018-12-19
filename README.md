@@ -10,7 +10,7 @@ O uso dela está todo exemplificado no xor.py.
 Primeiro é necessário importar a biblioteca. Recomendo importar dessa forma:
 
 ```
-from nnlib import NeuralNetwork
+from cletron import NeuralNetwork
 ```
 
 ### Criação

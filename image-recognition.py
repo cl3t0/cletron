@@ -1,5 +1,5 @@
 from mnist import MNIST
-from nnlib import NeuralNetwork
+from cletron import NeuralNetwork
 
 brain = NeuralNetwork()
 

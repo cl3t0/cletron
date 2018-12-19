@@ -1,4 +1,4 @@
-from nnlib import NeuralNetwork
+from cletron import NeuralNetwork
 import random
 
 brain = NeuralNetwork()
