@@ -204,21 +204,76 @@ class NeuralNetwork:
 
             return False
 
-    def train(self, inputData, expectedGuess):
-        
-        if len(inputData) == self.numOfNeurons[0] and len(expectedGuess) == self.numOfNeurons[-1]:
+    def setTestData(self, inputData, expectedData):
 
-            guess = self.guess(inputData)
+        self.testInputData = inputData
+        self.testExpectedData = expectedData
 
-            expectedGuess = numpy.array(expectedGuess)
+    def setTrainData(self, inputData, expectedData):
+
+        Len = len(inputData)
+
+        if Len <= 60000:
+            # Not enough, but you can.
+            self.inputGroups = []
+            self.inputGroups.append(inputData[:int(Len/2)])
+            self.inputGroups.append(inputData[int(Len/2):])
+            self.expectedGroups = []
+            self.expectedGroups.append(expectedData[:int(Len/2)])
+            self.expectedGroups.append(expectedData[int(Len/2):])
+
+        else:
+            # We can divide this in groups of 30000, or something like this
+            groupsLen = 30000
+
+            while True:
+                if Len % groupsLen >= 15000 or Len % groupsLen == 0:
+                    # nice!
+                    break
+                else:
+                    groupsLen += 500
+
+            self.inputGroups = []
+            self.expectedGroups = []
+
+            for i in range(int(Len / groupsLen)):
+                self.inputGroups.append(inputData[groupsLen*i:groupsLen*(i+1)])
+                self.expectedGroups.append(expectedData[groupsLen*i:groupsLen*(i+1)])
+
+            self.inputGroups.append(inputData[groupsLen*int(Len / groupsLen):])
+            self.expectedGroups.append(expectedData[groupsLen*int(Len / groupsLen):])
+
+    def test(self):
+
+        for i in range(len(self.testInputData)):
+
+            print('Guess:')
+            print(self.guess(self.testInputData[i]))
+            print('Real answer:')
+            print(self.testExpectedData[i])
+
+    def train(self):
+
+        for group in range(len(self.inputGroups)):
 
             cost = []
 
-            for i in range(self.numOfLayers):
+            for layer in range(self.numOfLayers):
 
-                cost.append(numpy.array([0]*self.numOfNeurons[i], dtype=numpy.float64))
+                cost.append(numpy.array([0]*self.numOfNeurons[layer], dtype=numpy.float64))
 
-            cost[-1] = squareit(guess - expectedGuess)
+            for inputData in range(len(self.inputGroups[group])):
+
+                guess = self.guess(self.inputGroups[group][inputData])
+                expectedGuess = numpy.array(self.expectedGroups[group][inputData])
+
+                cost[-1] += squareit(guess - expectedGuess)/len(self.inputGroups[group])
+
+            for L in range(self.numOfLayers-1, 0, -1):
+
+                weightTranspose = self.weights[L].T
+                matrix = numpy.dot(weightTranspose, cost[L])
+                cost[L-1] = matrix
 
             for L in range(self.numOfLayers-1, 0, -1):
 
@@ -235,8 +290,10 @@ class NeuralNetwork:
                 deltaBias = gradient
                 self.bias[L] += deltaBias
 
+        
 
-            return guess
 
-        else:
-            return False
+        
+
+
+        return guess

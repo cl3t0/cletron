@@ -1,74 +1,80 @@
 # Cletron
-Uma biblioteca de redes neurais feita por mim em Python 3. É iniciante, mas é bem flexível.
+A neural network library made by me, for my own learning, but that can be used in small projects.
 
-O uso dela está todo exemplificado no xor.py.
+All usage is exemplified in the image recognition program (image-recognition.py).
 
-## Como usar
+## how to use
 
-### Importar
+### Import
 
-Primeiro é necessário importar a biblioteca. Recomendo importar dessa forma:
+First, you need to import the library. To do this, you can do as follow.
 
 ```
 from cletron import NeuralNetwork
 ```
 
-### Criação
+### Criation
 
-Depois crie a sua rede neural:
+After that, bring your neural network to life.
 
 ```
 brain = NeuralNetwork()
 ```
 
-### Configuração
+### Configuration
 
-Agora é só configurar a quantidade de camadas e de neurônios em cada camada:
+Now you have to write some lines to configure the number of layers, the number of neurons in each layer and the learning rate.
 
 ```
 brain.numOfLayers = 3
-brain.numOfNeurons = [2, 2, 1]
+brain.numOfNeurons = [784, 1569, 10]
+brain.learningRate = 0.05
 ```
 
-Dar nome ao seu programa:
+Name your neural network:
 
 ```
-brain.programName = 'nomedomeuprograma'
+brain.programName = 'image-recognition'
 ```
 
-Gerar todos os neurônios:
+Generate the neurons:
 
 ```
 brain.generateNeurons()
 ```
 
-E carregar todos os *weights* e os *bias* (relaxe, se não existir um arquivo para guardar os *weights* e os *bias*, ele irá criar para você :D):
+Now, load the weights and the biases. (Relax, if these files do not exist, we will create then for you. :D)
 
 ```
 brain.useStoredWeights()
 brain.useStoredBias()
 ```
 
-### Treinamento
+### Training
 
-Gere ou crie seus dados de treinamento e treine sua rede (Não se esqueça de treinar diversas vezes, para que o resultado se torne mais acurado):
-
+Set your training data.
 ```
-brain.train(input, output)
-```
-
-### Teste
-
-Depois disso você pode testar se a rede está com bons resultados:
-
-```
-output = brain.guess(input)
-print(output)
+brain.setTrainData(train_images, train_labels)
 ```
 
-### Armazenamento
+Now, start the training!
+```
+brain.train()
+```
+### Test
 
-Não se esqueça de armazenar os *weights* e os *bias* ao final do código.
+After that, you can test if your neural network are doing well. :)
+Set your testing data.
+```
+brain.setTestData(test_images, test_labels)
+```
+Now, start the testing!
+```
+brain.test()
+```
+### Storage
+
+Don't forget to store your data (weights and biases) at the end of the code.
 
 ```
 brain.storeWeights()
@@ -78,5 +84,3 @@ brain.storeBias()
 ## Autor
 
 * **Pedro Cleto** - *Library creator*
-
-Vários códigos que podem estar ai, que foram criados usando a minha biblioteca, não necessariamente são meus.

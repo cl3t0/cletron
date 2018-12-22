@@ -3,8 +3,9 @@ from cletron import NeuralNetwork
 
 brain = NeuralNetwork()
 
-brain.numOfLayers = 4
-brain.numOfNeurons = [784, 32, 16, 10]
+brain.numOfLayers = 3
+brain.numOfNeurons = [784, 1569, 10]
+brain.learningRate = 0.05
 brain.programName = 'image-recognition'
 
 brain.generateNeurons()
@@ -14,52 +15,65 @@ brain.useStoredBias()
 
 mndata = MNIST('image-recognition_trainingdata')
 
-print('Carregando os dados para o treinamento...')
+print('Loading training data...')
 
-train_images, train_labels = mndata.load_training()
+train_images, train_labels_orig = mndata.load_training()
 
-print('Carregado!!')
+print('Loaded!!')
 
-print('--- tratando as imagens ---')
-for i in range(len(train_images)):
+quantidade = len(train_images)
+
+print('--- applying the image process ---')
+for i in range(quantidade):
 	for j in range(len(train_images[i])):
 		train_images[i][j] = train_images[i][j]/255
-print('--- imagens tratadas ---')
+print('--- process ended ---')
 
-print('O treinamento iniciado!')
-
-quantidade = len(train_labels)
-
+print('--- applying the label process --')
+train_labels = []
 for i in range(quantidade):
 	result = [0]*10
-	result[train_labels[i]] = 1
-	brain.train(train_images[i], result)
-	if i % 1000 == 0: print(round(100*i/quantidade, 1))
+	result[train_labels_orig[i]] = 1
+	train_labels.append(result)
+print('--- process ended ---')
 
-print('Treinamento finalizado!!')
+brain.setTrainData(train_images, train_labels)
 
-print('Carregando os dados para o teste...')
+print('Starting to train...')
 
-test_images, test_labels = mndata.load_testing()
+brain.train()
 
-print('Dados carregados!')
+print('Training ended!!')
 
-print('--- tratando as imagens ---')
-for i in range(len(test_images)):
+print('Loading testing data...')
+
+test_images, test_labels_orig = mndata.load_testing()
+
+print('Loaded!!')
+
+quantidade = len(test_images)
+
+print('--- applying the image process ---')
+for i in range(quantidade):
 	for j in range(len(test_images[i])):
 		test_images[i][j] = test_images[i][j]/255
-print('--- imagens tratadas ---')
+print('--- process ended ---')
 
-print('Teste iniciado!')
+print('--- applying the label process --')
+test_labels = []
+for i in range(quantidade):
+	result = [0]*10
+	result[test_labels_orig[i]] = 1
+	test_labels.append(result)
+print('--- process ended ---')
 
-for i in range(1000):
-	guess = brain.guess(test_images[i])
-	print('------------')
-	print(guess)
-	print('guess: ' + str(guess.tolist().index(max(guess))))
-	print('real answer: ' + str(test_labels[i]))
+brain.setTestData(test_images, test_labels)
 
-print('Teste finalizado!')
+print('Starting to test...')
+
+brain.test()
+
+print('Test ended!!')
 
 brain.storeWeights()
 brain.storeBias()
