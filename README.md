@@ -3,7 +3,7 @@ A neural network library made by me, for my own learning, but that can be used i
 
 All usage is exemplified in the image recognition program (image-recognition.py).
 
-## how to use
+## How to use
 
 ### Import
 
