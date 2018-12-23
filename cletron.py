@@ -89,7 +89,7 @@ class NeuralNetwork:
         self.numOfNeurons = [784, 16, 10]
         self.programName = 'neuralnetwork'
 
-    def generateNeurons(self):
+    def generateNeurons(self): # GERA NEURONIOS ZERADOS
 
         self.neurons = []
         self.weightedSum = [0]
@@ -102,7 +102,7 @@ class NeuralNetwork:
 
                 self.weightedSum.append(numpy.array([0]*self.numOfNeurons[i], dtype=numpy.float128))
 
-    def generateRandWeights(self):
+    def generateRandWeights(self): # GERA PESOS ALEATORIOS
 
         self.weights = [0]
 
@@ -111,7 +111,16 @@ class NeuralNetwork:
             matrix = randommatrix2d(self.numOfNeurons[i], self.numOfNeurons[i-1])
             self.weights.append(matrix)
 
-    def storeWeights(self):
+    def generateRandBias(self): # GERA BIAS ALEATORIOS
+
+        self.bias = [0]
+        
+        for i in range(1, self.numOfLayers):
+
+            bias = randommatrix1d(self.numOfNeurons[i])
+            self.bias.append(bias)
+
+    def storeWeights(self): # GUARDA OS PESOS NUMA PASTA
 
         try:
 
@@ -125,7 +134,21 @@ class NeuralNetwork:
 
             numpy.save('{}/weight{}.npy'.format(self.programName, i), self.weights[i])
 
-    def useStoredWeights(self):
+    def storeBias(self): # GUARDA OS BIAS NUMA PASTA
+
+        try:
+
+            os.mkdir(self.programName)
+
+        except FileExistsError:
+
+            pass
+
+        for i in range(1, self.numOfLayers):
+
+            numpy.save('{}/bias{}.npy'.format(self.programName, i), self.bias[i])
+
+    def useStoredWeights(self): # USA OS PESOS GUARDADOS
 
         self.weights = [0]
 
@@ -141,21 +164,7 @@ class NeuralNetwork:
             self.generateRandWeights()
             self.storeWeights()
 
-    def storeBias(self):
-
-        try:
-
-            os.mkdir(self.programName)
-
-        except FileExistsError:
-
-            pass
-
-        for i in range(1, self.numOfLayers):
-
-            numpy.save('{}/bias{}.npy'.format(self.programName, i), self.bias[i])
-
-    def useStoredBias(self):
+    def useStoredBias(self): # USA OS BIAS GUARDADOS
 
         self.bias = [0]
 
@@ -171,45 +180,7 @@ class NeuralNetwork:
             self.generateRandBias()
             self.storeBias()
 
-    def generateRandBias(self):
-
-        self.bias = [0]
-        
-        for i in range(1, self.numOfLayers):
-
-            bias = randommatrix1d(self.numOfNeurons[i])
-            self.bias.append(bias)
-
-    def propagate(self, layerToPropagate):
-
-        newmatrix = numpy.dot(self.weights[layerToPropagate], self.neurons[layerToPropagate-1])
-        newmatrix += self.bias[layerToPropagate]
-        self.weightedSum[layerToPropagate] = newmatrix
-        newmatrix = sigmoid(newmatrix)
-        self.neurons[layerToPropagate] = newmatrix
-
-    def guess(self, inputData):
-
-        if len(inputData) == self.numOfNeurons[0]:
-
-            self.neurons[0] = numpy.array(inputData)
-
-            for i in range(1, self.numOfLayers):
-
-                self.propagate(i)
-
-            return self.neurons[-1]
-        
-        else:
-
-            return False
-
-    def setTestData(self, inputData, expectedData):
-
-        self.testInputData = inputData
-        self.testExpectedData = expectedData
-
-    def setTrainData(self, inputData, expectedData):
+    def setTrainData(self, inputData, expectedData): # GUARDA OS DADOS DE TREINAMENTO EM BLOCOS/GRUPOS/SESSOES/EPOCAS
 
         Len = len(inputData)
 
@@ -243,57 +214,137 @@ class NeuralNetwork:
             self.inputGroups.append(inputData[groupsLen*int(Len / groupsLen):])
             self.expectedGroups.append(expectedData[groupsLen*int(Len / groupsLen):])
 
-    def test(self):
+    def feedforward(self): # FAZ O FEEDFORWARD
 
-        for i in range(len(self.testInputData)):
+        for layerToPropagate in range(1, self.numOfLayers):
 
-            print('Guess:')
-            print(self.guess(self.testInputData[i]))
-            print('Real answer:')
-            print(self.testExpectedData[i])
+            newmatrix = numpy.dot(self.weights[layerToPropagate], self.neurons[layerToPropagate-1])
+            newmatrix += self.bias[layerToPropagate]
+            newmatrix = sigmoid(newmatrix)
+            self.neurons[layerToPropagate] = newmatrix
+
+    def generateLoss(self): # GERA O LOSS ZERADO
+
+        self.loss = []
+
+        for layer in range(self.numOfLayers):
+
+            self.loss.append(numpy.array([0]*self.numOfNeurons[layer], dtype=numpy.float64))
 
     def train(self):
 
-        for group in range(len(self.inputGroups)):
+        # PASSA POR CADA UM DOS BLOCOS/GRUPOS/SESSOES/EPOCAS
+        for group in range(len(self.inputGroups)): 
 
-            cost = []
+            # RECRIA O LOSS ZERADO
+            self.generateLoss() 
 
-            for layer in range(self.numOfLayers):
+            # PASSA PELOS ELEMENTOS DE CADA BLOCO/GRUPO/SESSAO/EPOCA
+            for i in range(len(self.inputGroups[group])):
 
-                cost.append(numpy.array([0]*self.numOfNeurons[layer], dtype=numpy.float64))
+                # COLOCA O INPUT NA PRIMEIRA CAMADA
+                self.neurons[0] = numpy.array(self.inputGroups[group][i])
+                # FAZ O FEEDFORWARD
+                self.feedforward()
+                # RECEBE O RESULTADO DA REDE NEURAL NA ULTIMA CAMADA DELA
+                result = self.neurons[-1]
+                # GUARDA O RESULTADO ESPERADO EM "expectedResult"
+                expectedResult = numpy.array(self.expectedGroups[group][i])
 
-            for inputData in range(len(self.inputGroups[group])):
+                # AQUI TEMOS UMA PARTE QUE GEROU COMPLICAÇÕES, ENTAO AI VAI O TEXTAO:
+                '''
+                Como queremos o LOSS MÉDIO DE CADA GRUPO, precisamos somar todos eles, e dividir
+                pela quantidade de valores que somamos. Pense assim: Queremos a média de 'a', 'b',
+                'c' e 'd'. Podemos somar todos eles e dividir por 4, que seria da forma:
 
-                guess = self.guess(self.inputGroups[group][inputData])
-                expectedGuess = numpy.array(self.expectedGroups[group][inputData])
+                a + b + c + d
+                -------------
+                      4
+    
+                Ou podemos dividir essa conta em 4 frações, ficando da forma:
 
-                cost[-1] += squareit(guess - expectedGuess)/len(self.inputGroups[group])
+                 a   +   b   +   c   +   d
+                ---     ---     ---     ---
+                 4       4       4       4
 
+                 A SEGUNDA FORMA foi a que eu usei nessse caso.
+
+                 Observe que (result - expectedResult)² é o LOSS, mas como vamos somar todos os
+                 LOSS desse grupo e dividir pela quantidade de imagens no grupo, temos o
+                 len(self.inputGroups[group]) (quantidade de elementos no grupo) dividindo o LOSS.
+                '''
+                self.loss[-1] += squareit(result - expectedResult)/len(self.inputGroups[group])
+
+                
+            # OBSERVE TAMBÉM QUE ATÉ AQUI EU APENAS FIZ O FEEDFORWARD E CALCULEI A MEDIA DO LOSS
+                
+            # AGORA, COM A MÉDIA DO LOSS, PODEMOS CALCULAR O LOSS PARA OUTRAS CAMADAS,
+            # COMO É FEITO AGORA
+            # NESSE FOR, O 'L' PASSA POR TODOS OS VALORES DE CAMADA DE TRÁS PRA FRENTE,
+            # PRA CALCULAR O LOSS PARA TODAS AS CAMADAS.
             for L in range(self.numOfLayers-1, 0, -1):
 
                 weightTranspose = self.weights[L].T
-                matrix = numpy.dot(weightTranspose, cost[L])
-                cost[L-1] = matrix
+                self.loss[L-1] = numpy.dot(weightTranspose, self.loss[L])
 
+            # COM O LOSS CALCULADO EM TODAS AS CAMADAS, INICIAMOS O...
+
+            '''
+ | |              | |                                          | | (_)            
+ | |__   __ _  ___| | ___ __  _ __ ___  _ __   __ _  __ _  __ _| |_ _  ___  _ __  
+ | '_ \ / _` |/ __| |/ / '_ \| '__/ _ \| '_ \ / _` |/ _` |/ _` | __| |/ _ \| '_ \ 
+ | |_) | (_| | (__|   <| |_) | | | (_) | |_) | (_| | (_| | (_| | |_| | (_) | | | |
+ |_.__/ \__,_|\___|_|\_\ .__/|_|  \___/| .__/ \__,_|\__, |\__,_|\__|_|\___/|_| |_|
+                       | |             | |           __/ |                        
+                       |_|             |_|          |___/     (Backpropagation)
+
+            '''
+
+            # Passamos por todas as camadas de trás pra frente, calculando o gradiente
             for L in range(self.numOfLayers-1, 0, -1):
 
-                weightTranspose = self.weights[L].T
-                matrix = numpy.dot(weightTranspose, cost[L])
-                cost[L-1] = matrix
+                # AQUI CALCULAMOS O GRADIENTE
+                gradient = self.learningRate*numpy.multiply(self.loss[L], sigmoidDerivate(self.neurons[L]))
 
-                gradient = self.learningRate*numpy.multiply(cost[L], sigmoidDerivate(self.neurons[L]))
-
+                # AQUI MULTIPLICAMOS ELE PELOS NEURONIOS TRANSPOSTOS
+                # PARA CALCULAR A VARIAÇÃO DOS PESOS
                 deltaWeight = numpy.dot(gradient, self.neurons[L][numpy.newaxis].T)
 
-                self.weights[L] += deltaWeight
+                # APLICAMOS A VARIAÇÃO DE PESO
+                self.weights[L] -= deltaWeight
 
+                # CALCULAMOS A VARIAÇÃO DE BIAS
                 deltaBias = gradient
-                self.bias[L] += deltaBias
+                # APLICAMOS A VARIAÇÃO DE BIAS
+                self.bias[L] -= deltaBias
 
-        
+        return result
 
+    def setTestData(self, inputData, expectedData):
 
-        
+        self.testInputData = inputData
+        self.testExpectedData = expectedData
 
+    def test(self):
 
-        return guess
+        acertos = 0
+
+        for i in range(len(self.testInputData)):
+
+            print("Network's answer: ")
+            # COLOCA O INPUT NA PRIMEIRA CAMADA
+            self.neurons[0] = numpy.array(self.testInputData[i])
+            # FAZ O FEEDFORWARD
+            self.feedforward()
+            # RECEBE O RESULTADO DA REDE NEURAL NA ULTIMA CAMADA DELA
+            result = self.neurons[-1]
+            number = result.tolist().index(max(result))
+            print(number)
+            print('Real answer:')
+            expectednumber = self.testExpectedData[i].index(max(self.testExpectedData[i]))
+            print(expectednumber)
+            if (number == expectednumber): acertos += 1
+            print(number == expectednumber)
+            print('-------------------')
+
+        print('Scored {}% of the tests'.format(100*acertos/len(self.testInputData)))
