@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/retzl4ff/cletron/pkg/matrix"
+	"github.com/cl3t0/cletron/pkg/matrix"
 )
 
 func TestDotProductResult(t *testing.T) {

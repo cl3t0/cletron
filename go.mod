@@ -1,3 +1,3 @@
-module github.com/retzl4ff/cletron
+module github.com/cl3t0/cletron
 
 go 1.24.3
