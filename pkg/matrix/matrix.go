@@ -5,18 +5,22 @@ import (
 )
 
 func DotProduct(m1 [][]float64, m2 [][]float64) ([][]float64, error) {
-	if len(m1[0]) != len(m2) {
-		return nil, errors.New("the number of columns in the first matrix must be equal to the number of rows in the second matrix")
-	}
-
 	result := make([][]float64, len(m1))
 
-	println(result)
+	m1_row_quantity := len(m1)
+	m1_column_quantity := len(m1[0])
+	m2_row_quantity := len(m2)
+	m2_column_quantity := len(m2[0])
 
-	for i := 0; i < len(m1); i++ {
-		row := make([]float64, len(m2[0]))
+	if m1_column_quantity != m2_row_quantity {
+		return nil, errors.New("the number of columns in the first matrix must be equal to the number of rows in the second matrix")
+	}
+	
 
-		for j := 0; j < len(m2[i]); j++ {
+	for i := 0; i < m1_row_quantity; i++ {
+		row := make([]float64, m2_column_quantity)
+
+		for j := 0; j < m2_column_quantity; j++ {
 			sum := 0.0
 			
 			for k := 0; k < len(m2); k++ {
@@ -42,6 +46,7 @@ func MatrixSum(m1 [][]float64, m2 [][]float64) ([][]float64, error) {
 	if row_quantity != len(m2) {
 		return nil, errors.New("row quantity does not match")
 	}
+
 	if column_quantity != len(m2[0]) {
 		return nil, errors.New("column quantity does not match")
 	}
