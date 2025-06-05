@@ -34,3 +34,48 @@ func DotProduct(m1 [][]float64, m2 [][]float64) ([][]float64, error) {
 
 	return result, nil
 }
+
+func MatrixSum(m1 [][]float64, m2 [][]float64) ([][]float64, error) {
+	row_quantity := len(m1)
+	column_quantity := len(m1[0])
+
+	if row_quantity != len(m2) {
+		return nil, errors.New("row quantity does not match")
+	}
+	if column_quantity != len(m2[0]) {
+		return nil, errors.New("column quantity does not match")
+	}
+
+	result := make([][]float64, row_quantity)
+
+	for i := 0; i < row_quantity; i++ {
+		row := make([]float64, column_quantity)
+
+		for j := 0; j < column_quantity; j++ {
+			row[j] = m1[i][j] + m2[i][j]
+		}
+
+		result[i] = row
+	}
+
+	return result, nil
+}
+
+func MultiplyByScalar(m [][]float64, scalar float64) ([][]float64, error) {
+	row_quantity := len(m)
+	column_quantity := len(m[0])
+
+	result := make([][]float64, row_quantity)
+
+	for i := 0; i < row_quantity; i++ {
+		row := make([]float64, column_quantity)
+
+		for j := 0; j < column_quantity; j++ {
+			row[j] = m[i][j] * scalar
+		}
+
+		result[i] = row
+	}
+
+	return result, nil
+}
