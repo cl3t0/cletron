@@ -7,22 +7,22 @@ import (
 func DotProduct(m1 [][]float64, m2 [][]float64) ([][]float64, error) {
 	result := make([][]float64, len(m1))
 
-	m1_row_quantity := len(m1)
-	m1_column_quantity := len(m1[0])
-	m2_row_quantity := len(m2)
-	m2_column_quantity := len(m2[0])
+	m1RowQuantity := len(m1)
+	m1ColumnQuantity := len(m1[0])
+	m2RowQuantity := len(m2)
+	m2ColumnQuantity := len(m2[0])
 
-	if m1_column_quantity != m2_row_quantity {
+	if m1ColumnQuantity != m2RowQuantity {
 		return nil, errors.New("the number of columns in the first matrix must be equal to the number of rows in the second matrix")
 	}
 
-	for i := 0; i < m1_row_quantity; i++ {
-		row := make([]float64, m2_column_quantity)
+	for i := range m1RowQuantity {
+		row := make([]float64, m2ColumnQuantity)
 
-		for j := 0; j < m2_column_quantity; j++ {
+		for j := range m2ColumnQuantity {
 			sum := 0.0
 
-			for k := 0; k < len(m2); k++ {
+			for k := range len(m2) {
 				m1_element := m1[i][k]
 				m2_element := m2[k][j]
 
@@ -52,10 +52,10 @@ func MatrixSum(m1 [][]float64, m2 [][]float64) ([][]float64, error) {
 
 	result := make([][]float64, rowQuantity)
 
-	for i := 0; i < rowQuantity; i++ {
+	for i := range rowQuantity {
 		row := make([]float64, columnQuantity)
 
-		for j := 0; j < columnQuantity; j++ {
+		for j := range columnQuantity {
 			row[j] = m1[i][j] + m2[i][j]
 		}
 
@@ -71,10 +71,10 @@ func MultiplyByScalar(m [][]float64, scalar float64) ([][]float64, error) {
 
 	result := make([][]float64, rowQuantity)
 
-	for i := 0; i < rowQuantity; i++ {
+	for i := range rowQuantity {
 		row := make([]float64, columnQuantity)
 
-		for j := 0; j < columnQuantity; j++ {
+		for j := range columnQuantity {
 			row[j] = m[i][j] * scalar
 		}
 
@@ -89,12 +89,12 @@ func Transpose(m [][]float64) [][]float64 {
 	columnQuantity := len(m[0])
 	result := make([][]float64, columnQuantity)
 
-	for i := 0; i < len(result); i++ {
+	for i := range result {
 		result[i] = make([]float64, rowQuantity)
 	}
 
-	for i := 0; i < rowQuantity; i++ {
-		for j := 0; j < columnQuantity; j++ {
+	for i := range rowQuantity {
+		for j := range columnQuantity {
 			result[j][i] = m[i][j]
 		}
 	}
