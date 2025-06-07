@@ -1,5 +1,7 @@
 # Cletron
 
+> WIP: This repository is being rewritten in Go. The Python version of the code is stored in the commit history.
+
 A neural network library made by me, for my own learning, but that can also be used in small projects.
 
 All usage is exemplified in the image recognition program (mnist.go).
@@ -59,7 +61,7 @@ brain.StoreWeights("./yourFilePath/weightsFile.bin")
 brain.StoreBias("./yourFilePath/biasFile.bin")
 ```
 
-## Autor
+## Author
 
 - **Pedro Cleto** - _Library creator_
 - **João Retzlaff** - _Collaborator_

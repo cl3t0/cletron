@@ -23,10 +23,10 @@ func DotProduct(m1 [][]float64, m2 [][]float64) ([][]float64, error) {
 			sum := 0.0
 
 			for k := range len(m2) {
-				m1_element := m1[i][k]
-				m2_element := m2[k][j]
+				m1Element := m1[i][k]
+				m2Element := m2[k][j]
 
-				sum += m1_element * m2_element
+				sum += m1Element * m2Element
 			}
 
 			row[j] = sum

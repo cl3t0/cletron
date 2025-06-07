@@ -8,20 +8,20 @@ import (
 )
 
 func TestDotProductResult(t *testing.T) {
-	mt1 := [][]float64{
+	m1 := [][]float64{
 		{1, 2, 3, 4},
 		{5, 6, 7, 8},
 		{9, 10, 11, 12},
 	}
 
-	mt2 := [][]float64{
+	m2 := [][]float64{
 		{1},
 		{2},
 		{3},
 		{4},
 	}
 
-	newMatrix, _ := matrix.DotProduct(mt1, mt2)
+	newMatrix, _ := matrix.DotProduct(m1, m2)
 
 	want := [][]float64{
 		{30},
@@ -35,19 +35,19 @@ func TestDotProductResult(t *testing.T) {
 }
 
 func TestWrongDimensions(t *testing.T) {
-	mt1 := [][]float64{
+	m1 := [][]float64{
 		{1, 2, 3, 4},
 		{5, 6, 7, 8},
 		{9, 10, 11, 12},
 	}
 
-	mt2 := [][]float64{
+	m2 := [][]float64{
 		{1},
 		{2},
 		{3},
 	}
 
-	_, err := matrix.DotProduct(mt1, mt2)
+	_, err := matrix.DotProduct(m1, m2)
 
 	want := err != nil
 
